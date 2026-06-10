@@ -1,0 +1,101 @@
+version: "3.9"
+
+services:
+
+  # ─── TurboVec Enhanced Agent ─────────────────────────────────────────────
+  turbovec-agent:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: turbovec-agent
+    ports:
+      - "8016:8016"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - CHROMA_HOST=chroma
+      - CHROMA_PORT=8000
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - turbovec-index:/app/.index
+      - turbovec-models:/app/models
+      - turbovec-memory:/app/agent/memory/data
+    depends_on:
+      - qdrant
+      - chroma
+    networks:
+      - turbovec-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+    command: ["python", "-m", "agent.main", "serve", "--host", "0.0.0.0", "--port", "8016"]
+
+  # ─── Qdrant Vector DB ─────────────────────────────────────────────────────
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: turbovec-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant-data:/qdrant/storage
+    networks:
+      - turbovec-net
+    restart: unless-stopped
+
+  # ─── Chroma Vector DB ────────────────────────────────────────────────────
+  chroma:
+    image: chromadb/chroma:latest
+    container_name: turbovec-chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma-data:/chroma/chroma
+    networks:
+      - turbovec-net
+    restart: unless-stopped
+
+  # ─── Ollama (local LLM for offline/privacy mode) ─────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: turbovec-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - turbovec-net
+    restart: unless-stopped
+    profiles:
+      - ollama
+
+# ─── GPU Profile ────────────────────────────────────────────────────────────
+# Run with: docker compose --profile gpu up
+# turbovec-agent-gpu:
+#   extends: turbovec-agent
+#   deploy:
+#     resources:
+#       reservations:
+#         devices:
+#           - driver: nvidia
+#             count: 1
+#             capabilities: [gpu]
+#   profiles:
+#     - gpu
+
+volumes:
+  turbovec-index:
+  turbovec-models:
+  turbovec-memory:
+  qdrant-data:
+  chroma-data:
+  ollama-data:
+
+networks:
+  turbovec-net:
+    driver: bridge

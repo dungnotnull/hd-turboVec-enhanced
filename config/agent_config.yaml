@@ -1,0 +1,96 @@
+agent:
+  name: turbovec-enhanced
+  version: "1.0.0"
+  log_level: INFO
+
+server:
+  host: "0.0.0.0"
+  port: 8016
+
+hnsw:
+  dim: 768
+  M: 32
+  ef_construction: 400
+  ef_search: 200
+  metric: cosine
+  index_dir: .index
+
+rag:
+  chunk_size: 512
+  chunk_overlap: 64
+  sentences_per_chunk: 5
+  semantic_threshold: 0.75
+  default_k: 10
+  rerank_candidates: 50
+  generate_answer: true
+
+llm:
+  provider_order: [claude, openai, ollama]
+  claude_model: claude-opus-4-8
+  openai_model: gpt-4o
+  ollama_model: llama3
+  ollama_base_url: http://localhost:11434
+  max_tokens: 1024
+  temperature: 0.0
+  retry_delays: [1, 2, 4]
+
+hf_models:
+  cache_dir: ./models
+  idle_timeout_s: 600
+  use_gpu: true
+  preload: [bge-large]
+  embedding_model: bge-large
+  reranker_model: bge-reranker
+  fast_embedding_model: minilm
+
+hybrid_search:
+  bm25_k1: 1.5
+  bm25_b: 0.75
+  rrf_k: 60
+  dense_candidates: 50
+  sparse_candidates: 50
+
+backends:
+  hnswlib:
+    dim: 768
+    metric: cosine
+  faiss:
+    dim: 768
+  chroma:
+    in_memory: true
+    collection: turbovec
+    host: localhost
+    port: 8000
+  qdrant:
+    host: localhost
+    port: 6333
+    collection: turbovec
+  weaviate:
+    host: http://localhost:8080
+    class_name: TurboVec
+    dim: 768
+
+benchmark:
+  default_backends: [hnswlib, faiss]
+  default_n_vectors: 10000
+  default_n_queries: 100
+  default_k: 10
+  output_path: benchmark_report.md
+
+knowledge_updater:
+  schedule: "0 2 * * 0"
+  arxiv_categories: [cs.DB, cs.IR, cs.LG]
+  semantic_scholar_queries:
+    - "vector database approximate nearest neighbor"
+    - "dense retrieval reranking BEIR benchmark"
+    - "retrieval augmented generation knowledge"
+  github_repos:
+    - nmslib/hnswlib
+    - facebookresearch/faiss
+    - qdrant/qdrant
+    - weaviate/weaviate
+    - chroma-core/chroma
+    - rapidsai/cuvs
+  top_n_papers: 20
+  recency_window_days: 90
+  brain_path: SECOND-KNOWLEDGE-BRAIN.md

@@ -1,0 +1,80 @@
+# TurboVec Enhanced — Git Ignore
+
+# ─── Python ─────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ─── Virtual Environments ────────────────────────────────────────
+venv/
+ENV/
+env/
+.venv
+
+# ─── IDE ───────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ─── Jupyter ───────────────────────────────────────────────────────
+.ipynb_checkpoints
+*.ipynb
+
+# ─── Testing ───────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ─── Models & Data ─────────────────────────────────────────────────
+models/
+*.index/
+*.bin
+*.meta.pkl
+*.faiss
+agent/memory/*.db
+
+# ─── Logs ───────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ─── Environment ────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ─── Claude/Memory ──────────────────────────────────────────────────
+.claude/
+.memory/
+
+# ─── Benchmarks ────────────────────────────────────────────────────
+benchmark_report.md
+benchmark_results/
+
+# ─── Temporary ─────────────────────────────────────────────────────
+tmp/
+temp/
+*.tmp
